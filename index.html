@@ -1,70 +1,163 @@
-<!doctype html> 
+<!doctype html>
+
 <head>
     <title>Canvas Tutorial</title>
 </head>
+
 <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
-<script>
-    var canvas , canvasContext;
-    
-    window.onload = function(){
-        canvas = document.getElementById('gameCanvas');
-        canvasContext = canvas.getContext('2d');
-        
-        document.addEventListener('keydown', keyPressed)
-        document.addEventListener('keyup', keyReleased)
-        
-        setInterval(mainloop, 1000/50);
-    }
-    var LeftArrow = 0;
-    var KeyPress = 0;
-    var playerXpos = 0;
-    var playerYpos = 0;
-    var playerXspeed = 5;
-    var playerYspeed = 4;
-    const PLAYER_SIZE = 20;
-    
-    var upKeyPress = false;
-    
-    const UP_KEY = 38;
-    
-    
-    function mainloop(){
-        colorRect(0,0,canvas.width,canvas.height, 'black');
-        colorRect(playerXpos,playerYpos,PLAYER_SIZE,PLAYER_SIZE,'red');
-        
-        playerMove();
-    }
-    
-    
-    function keyPressed(evt){
-        if(evt.Code == UP_KEY && playerYpos > 0){
-            upKeyPress = true;
-        }
-        
-    }
-    
-    function keyReleased(evt){
-            if(evt.Code == UP_KEY){
-            upKeyPress = false;
-        }
-    }
-    
-    
-    
-    function colorRect(x,y,w,h,c){
-        canvasContext.fillStyle = c;
-        canvasContext.fillRect(x,y,w,h);
-    }
-    
-    function playerMove(){
-       if(upKeyPress){
-           playerYpos -= playerYspeed
-       }
-    }
-    
+    <script>
+        var canvas, canvasContext;
 
-    
-    
+        window.onload = function() {
+            canvas = document.getElementById('gameCanvas');
+            canvasContext = canvas.getContext('2d');
+
+            document.addEventListener('keydown', keyPressed)
+            document.addEventListener('keyup', keyReleased)
+
+            setInterval(mainloop, 1000 / 50);
+        }
+        var LeftArrow = 0;
+        var KeyPress = 0;
+        var playerXpos = 0;
+        var playerYpos = 100;
+        var playerXspeed = 5;
+        var playerYspeed = 7;
+        const PLAYER_SIZE = 20;
+
+        var spaceKeyPress = false;
+
+        const SPACE_KEY = 0x20;
+     
+        //gravity
+        var jump = false;
+        var direction = 1;
+        var velocity = 2;
+        var fallingSpeed = 5;
+        
+        // enemies array
+        var enemies = [];
+        var totalEnemies = 8;
+        
+        var startingPos = true;
+        var score = 0;
+
+
+        function mainloop() {
+            colorRect(0, 0, canvas.width, canvas.height, 'black');
+            colorRect(playerXpos, playerYpos, PLAYER_SIZE, PLAYER_SIZE, 'red');
+            if(startingPos){
+                for(i=0; i < totalEnemies; i++){
+                    makeEnemy();
+                }
+                startingPos = false;
+               }
+            playerMove();
+            gravity();
+            enemyMove();
+            drawEnemy();
+        }
+        
+        
+        
+        
+        function enemyMove(){
+          enemies.forEach(function(enemy,i,array){
+              
+            
+            enemy.enemyXpos -= enemy.enemyXspeed;
+            
+            if(enemy.enemyXpos < 0){
+                enemy.enemyYpos = Math.floor(Math.random()*(canvas.height - enemy.ENEMY_SIZE));
+                enemy.enemyXpos = canvas.width + enemy.ENEMY_WIDTH;
+            }
+            
+            if(enemy.enemyYpos + enemy.enemyHeight > playerYpos && enemy.enemyYpos < playerYpos + PLAYER_SIZE && enemy.enemyXpos + enemy.ENEMY_WIDTH > PLAYER_SIZE && enemy.enemyXpos < playerXpos + PLAYER_SIZE){
+                playerXpos = 0;
+                playerYpos = canvas.height - PLAYER_SIZE
+                score++;
+                console.log('score:' + score);
+            }
+          });
+        }
+        
+        
+        function gravity(){
+            if(playerYpos < canvas.width - PLAYER_SIZE){
+            playerYpos = playerYpos + (direction*velocity);
+         }
+        }
+        
+
+        function keyPressed(evt) {
+            if (evt.keyCode == SPACE_KEY) {
+                spaceKeyPress = true;
+            }
+
+        }
+
+
+        function keyReleased(evt) {
+            if (evt.keyCode == SPACE_KEY) {
+                spaceKeyPress = false;
+            }
+        }
+
+        function colorRect(x, y, w, h, c) {
+            canvasContext.fillStyle = c;
+            canvasContext.fillRect(x, y, w, h);
+        }
+
+        function playerMove() {
+            if (spaceKeyPress && playerYpos > 0) {
+                playerYpos -= playerYspeed
+            }
+        }
+        
+        var pipeCounter = 0;
+        var pipeSets = 0
+        
+        function makeEnemy(){
+            var enemyGap = Math.floor(Math.random() *(canvas.height * 0.4 - canvas.height * 0.2) + canvas.height * 0.2);
+            
+            const ENEMY_WIDTH = 15;
+            const enemyHeight = canvas.height / 2 - enemyGap / 2;
+            var enemyXpos = 0
+            var enemyXspeed = 5;
+            
+            var enemyYpos = 0;
+            if(pipeCounter %2 == 0 || pipeCounter == 0){
+                enemyXpos = canvas.width + (ENEMY_WIDTH * 3) * pipeSets * 2;
+                enemyYpos = 0;
+            } else {
+                enemyXpos = canvas.width + (ENEMY_WIDTH * 3) * pipeSets * 2;
+                enemyYpos = canvas.height - enemyHeight;
+                pipeSets++;
+            }
+            
+            pipeCounter++;
+            
+            
+            
+            var enemy = {
+                enemyXpos: enemyXpos,
+                enemyYpos: enemyYpos,
+                ENEMY_WIDTH: ENEMY_WIDTH,
+                enemyHeight: enemyHeight,
+                enemyXspeed: enemyXspeed
+            }
+            
+            enemies.push(enemy);
+        }
+        
+        function drawEnemy(){
+            enemies.forEach(function(enemy, i){
+                colorRect(enemy.enemyXpos, enemy.enemyYpos, enemy.ENEMY_WIDTH, enemy.enemyHeight, 'green');
+            });             
+        }
+        
+
+        
     </script>
 </body>
