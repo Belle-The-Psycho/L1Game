@@ -7,7 +7,39 @@
 <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script>
+        var userName = '';
+        while (userName == '' || userName == null) {
+            userName = prompt('whats your name?', 'Dave');
+        }
+
+        var speed = 0;
+
+        var difficulty = '';
+
+        var pass = false;
+        while (pass == false) {
+            difficulty = prompt('difficulty? Please answer in lowercase.', 'easy');
+            if (difficulty == 'easy') {
+                pass = true;
+            }
+        }
+
+        if (difficulty == 'easy') {
+            speed = 4;
+        } else if (difficulty == 'medium'){
+            speed = 5;
+        } else if (difficulty == 'hard'){
+            speed = 6;
+        } else if (difficulty == 'impossible'){
+            speed = 8;
+        }
+            //Name and Difficulty
+
+
+
         var canvas, canvasContext;
+
+
 
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
@@ -17,8 +49,9 @@
             document.addEventListener('keyup', keyReleased)
 
             setInterval(mainloop, 1000 / 50);
+            //end func
         }
-        var LeftArrow = 0;
+        //movement vars
         var KeyPress = 0;
         var playerXpos = 0;
         var playerYpos = 100;
@@ -29,105 +62,127 @@
         var spaceKeyPress = false;
 
         const SPACE_KEY = 0x20;
-     
+
         //gravity
         var jump = false;
         var direction = 1;
         var velocity = 2;
         var fallingSpeed = 5;
-        
+
         // enemies array
         var enemies = [];
-        var totalEnemies = 8;
-        
+        var totalEnemies = 10;
+
         var startingPos = true;
         var score = 0;
 
+        var gameRun = true;
+
+
 
         function mainloop() {
-            colorRect(0, 0, canvas.width, canvas.height, 'black');
-            colorRect(playerXpos, playerYpos, PLAYER_SIZE, PLAYER_SIZE, 'red');
-            if(startingPos){
-                for(i=0; i < totalEnemies; i++){
-                    makeEnemy();
+            if (gameRun == true) {
+
+
+                colorRect(0, 0, canvas.width, canvas.height, 'black');
+                colorRect(playerXpos, playerYpos, PLAYER_SIZE, PLAYER_SIZE, 'red');
+                if (startingPos) {
+                    for (i = 0; i < totalEnemies; i++) {
+                        makeEnemy();
+                    }
+                    startingPos = false;
                 }
-                startingPos = false;
-               }
-            playerMove();
-            gravity();
-            enemyMove();
-            drawEnemy();
-        }
-        
-        
-        
-        
-        function enemyMove(){
-          enemies.forEach(function(enemy,i,array){
-              
-            
-            enemy.enemyXpos -= enemy.enemyXspeed;
-            
-            if(enemy.enemyXpos < 0){
-                enemy.enemyYpos = Math.floor(Math.random()*(canvas.height - enemy.ENEMY_SIZE));
-                enemy.enemyXpos = canvas.width + enemy.ENEMY_WIDTH;
+                playerMove();
+                gravity();
+                enemyMove();
+                drawEnemy();
+
+            } else {
+                colorRect(0, 0, canvas.width, canvas.height, 'red');
+                alert('Poor thing ' + userName + ' you died! Your score was ' + score);
+                location.reload();
             }
-            
-            if(enemy.enemyYpos + enemy.enemyHeight > playerYpos && enemy.enemyYpos < playerYpos + PLAYER_SIZE && enemy.enemyXpos + enemy.ENEMY_WIDTH > PLAYER_SIZE && enemy.enemyXpos < playerXpos + PLAYER_SIZE){
-                playerXpos = 0;
-                playerYpos = canvas.height - PLAYER_SIZE
-                score++;
-                console.log('score:' + score);
+        } //end func
+
+
+
+
+
+        function enemyMove() {
+            enemies.forEach(function(enemy, i, array) {
+
+
+                enemy.enemyXpos -= enemy.enemyXspeed;
+
+                if (enemy.enemyXpos < 0) {
+                    if(i%2 == 0){
+                        enemy.enemyHeight = Math.floor(Math.random()*(canvas.height*0.4 - canvas.height*0.3))+ canvas.height*0.3;
+                       enemy.enemyYpos = canvas.height - enemy.enemyHeight;
+                    } else {
+                        enemy.enemyHeight = Math.floor(Math.random()*(canvas.height*0.4 - canvas.height*0.3))+ canvas.height*0.35;
+                        enemy.enemyYpos = 0;
+                    }
+                    enemy.enemyXpos = canvas.width + enemy.ENEMY_WIDTH;
+                    score++;
+                    console.log('score:' + score);
+                    
+                }
+
+                if (enemy.enemyYpos + enemy.enemyHeight > playerYpos && enemy.enemyYpos < playerYpos + PLAYER_SIZE && enemy.enemyXpos + enemy.ENEMY_WIDTH > PLAYER_SIZE && enemy.enemyXpos < playerXpos + PLAYER_SIZE) {
+                    playerXpos = 0;
+                    playerYpos = canvas.height / 2;
+                    gameRun = false;
+                
+                }
+            }); // end func 
+        }
+
+
+        function gravity() {
+            if (playerYpos < canvas.width - PLAYER_SIZE) {
+                playerYpos = playerYpos + (direction * velocity);
             }
-          });
-        }
-        
-        
-        function gravity(){
-            if(playerYpos < canvas.width - PLAYER_SIZE){
-            playerYpos = playerYpos + (direction*velocity);
-         }
-        }
-        
+        } //end func
+
 
         function keyPressed(evt) {
             if (evt.keyCode == SPACE_KEY) {
                 spaceKeyPress = true;
             }
 
-        }
+        } //end func
 
 
         function keyReleased(evt) {
             if (evt.keyCode == SPACE_KEY) {
                 spaceKeyPress = false;
             }
-        }
+        } //end func
 
         function colorRect(x, y, w, h, c) {
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
-        }
+        } //end func
 
         function playerMove() {
             if (spaceKeyPress && playerYpos > 0) {
                 playerYpos -= playerYspeed
             }
-        }
-        
+        } //end func
+
         var pipeCounter = 0;
         var pipeSets = 0
-        
-        function makeEnemy(){
-            var enemyGap = Math.floor(Math.random() *(canvas.height * 0.4 - canvas.height * 0.2) + canvas.height * 0.2);
-            
+
+        function makeEnemy() {
+            var enemyGap = Math.floor(Math.random() * (canvas.height * 0.4 - canvas.height * 0.2) + canvas.height * 0.2);
+
             const ENEMY_WIDTH = 15;
             const enemyHeight = canvas.height / 2 - enemyGap / 2;
             var enemyXpos = 0
             var enemyXspeed = 5;
-            
+
             var enemyYpos = 0;
-            if(pipeCounter %2 == 0 || pipeCounter == 0){
+            if (pipeCounter % 2 == 0 || pipeCounter == 0) {
                 enemyXpos = canvas.width + (ENEMY_WIDTH * 3) * pipeSets * 2;
                 enemyYpos = 0;
             } else {
@@ -135,11 +190,12 @@
                 enemyYpos = canvas.height - enemyHeight;
                 pipeSets++;
             }
-            
+
             pipeCounter++;
-            
-            
-            
+            //end func
+
+
+
             var enemy = {
                 enemyXpos: enemyXpos,
                 enemyYpos: enemyYpos,
@@ -147,17 +203,15 @@
                 enemyHeight: enemyHeight,
                 enemyXspeed: enemyXspeed
             }
-            
+
             enemies.push(enemy);
         }
-        
-        function drawEnemy(){
-            enemies.forEach(function(enemy, i){
-                colorRect(enemy.enemyXpos, enemy.enemyYpos, enemy.ENEMY_WIDTH, enemy.enemyHeight, 'green');
-            });             
-        }
-        
 
-        
+        function drawEnemy() {
+            enemies.forEach(function(enemy, i) {
+                colorRect(enemy.enemyXpos, enemy.enemyYpos, enemy.ENEMY_WIDTH, enemy.enemyHeight, 'green');
+            });
+        } //end func
+
     </script>
 </body>
