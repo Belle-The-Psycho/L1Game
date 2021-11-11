@@ -26,14 +26,14 @@
 
         if (difficulty == 'easy') {
             speed = 4;
-        } else if (difficulty == 'medium'){
+        } else if (difficulty == 'medium') {
             speed = 5;
-        } else if (difficulty == 'hard'){
+        } else if (difficulty == 'hard') {
             speed = 6;
-        } else if (difficulty == 'impossible'){
+        } else if (difficulty == 'impossible') {
             speed = 8;
         }
-            //Name and Difficulty
+        //Name and Difficulty
 
 
 
@@ -115,24 +115,24 @@
                 enemy.enemyXpos -= enemy.enemyXspeed;
 
                 if (enemy.enemyXpos < 0) {
-                    if(i%2 == 0){
-                        enemy.enemyHeight = Math.floor(Math.random()*(canvas.height*0.4 - canvas.height*0.3))+ canvas.height*0.3;
-                       enemy.enemyYpos = canvas.height - enemy.enemyHeight;
+                    if (i % 2 == 0) {
+                        enemy.enemyHeight = Math.floor(Math.random() * (canvas.height * 0.4 - canvas.height * 0.3)) + canvas.height * 0.3;
+                        enemy.enemyYpos = canvas.height - enemy.enemyHeight;
                     } else {
-                        enemy.enemyHeight = Math.floor(Math.random()*(canvas.height*0.4 - canvas.height*0.3))+ canvas.height*0.35;
+                        enemy.enemyHeight = Math.floor(Math.random() * (canvas.height * 0.4 - canvas.height * 0.3)) + canvas.height * 0.35;
                         enemy.enemyYpos = 0;
                     }
                     enemy.enemyXpos = canvas.width + enemy.ENEMY_WIDTH;
                     score++;
                     console.log('score:' + score);
-                    
+
                 }
 
                 if (enemy.enemyYpos + enemy.enemyHeight > playerYpos && enemy.enemyYpos < playerYpos + PLAYER_SIZE && enemy.enemyXpos + enemy.ENEMY_WIDTH > PLAYER_SIZE && enemy.enemyXpos < playerXpos + PLAYER_SIZE) {
                     playerXpos = 0;
                     playerYpos = canvas.height / 2;
                     gameRun = false;
-                
+
                 }
             }); // end func 
         }
